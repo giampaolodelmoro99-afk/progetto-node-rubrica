@@ -56,7 +56,7 @@ const deleteMe = async (req, res) => {
             DELETE FROM users WHERE id = ?
         `, [req.user.id]);
 
-        if (result.affectedRows === 0) return res.status(404).json({ message: 'Account non trovato' });
+        if (!result || result.affectedRows === 0) return res.status(404).json({ message: 'Account non trovato' });
 
         res.json({ message: 'Account eliminato con successo' });
     } catch (err) {

@@ -4,21 +4,10 @@ const {pool} = require('../db');
 const getAddressBook = async (req, res) => {
     try{
         const rows = await pool.query(`
-            SELECT 
-                address_book.id,
-                address_book.name,
-                address_book.surname,
-                address_book.qualification,
-                address_book.city,
-                address_book.street,
-                address_book.house_number,
-                phone_number.number,
-                email.email
+            SELECT id, name, surname, qualification, city, street, house_number
             FROM address_book
-            LEFT JOIN phone_number ON address_book.id = phone_number.address_book_id
-            LEFT JOIN email ON address_book.id = email.address_book_id
-            WHERE address_book.user_id = ?`, [req.user.id]);
-
+            WHERE user_id = ?`, [req.user.id]);
+            
             res.json(rows);
 
     }catch(err){
@@ -78,7 +67,7 @@ const deleteAddressBook = async (req, res) => {
         const result = await pool.query(`
             DELETE FROM address_book WHERE id = ? AND user_id = ?`, [id, req.user.id]);
 
-        if(result.affectedRows === 0) return res.status(404).json({ message: 'Contatto non trovato o non autorizzato' });
+        if(!result || result.affectedRows === 0) return res.status(404).json({ message: 'Contatto non trovato o non autorizzato' });
 
         res.status(200).json({ message: 'Contatto eliminato con successo' });
 

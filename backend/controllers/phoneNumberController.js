@@ -1,5 +1,22 @@
 const {pool} = require('../db');
 
+const getPhoneNumber = async (req,res) => {
+    const {address_book_id} = req.params;
+
+    try{
+        const rows = await pool.query(`
+            SELECT phone_number.id, phone_number.number
+            FROM phone_number
+            JOIN address_book ON phone_number.address_book_id = address_book.id
+            WHERE address_book.user_id = ? AND phone_number.address_book_id = ?`, [req.user.id, address_book_id]);
+            
+            res.json(rows);
+
+    }catch(err){
+        res.status(500).json({ message: 'Errore server' });
+    }
+};
+
 const createPhoneNumber = async (req, res) => {
     const {number} = req.body;
     const {address_book_id} = req.params;
@@ -76,6 +93,7 @@ const deletePhoneNumber = async (req, res) => {
 };
 
 module.exports = {
+    getPhoneNumber,
     createPhoneNumber,
     updatePhoneNumber,
     deletePhoneNumber,

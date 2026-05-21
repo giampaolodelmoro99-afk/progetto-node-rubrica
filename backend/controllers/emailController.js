@@ -1,5 +1,22 @@
 const {pool} = require('../db');
 
+const getEmail = async (req,res) => {
+    const {address_book_id} = req.params;
+
+    try{
+        const rows = await pool.query(`
+            SELECT email.id, email.email
+            FROM email
+            JOIN address_book ON email.address_book_id = address_book.id
+            WHERE address_book.user_id = ? AND email.address_book_id = ?`, [req.user.id, address_book_id]);
+            
+            res.json(rows);
+
+    }catch(err){
+        res.status(500).json({ message: 'Errore server' });
+    }
+};
+
 const createEmail = async (req, res) => {
     const {email} = req.body;
     const {address_book_id} = req.params;
@@ -68,6 +85,7 @@ const deleteEmail = async (req, res) => {
 };
 
 module.exports = {
+    getEmail,
     createEmail,
     updateEmail,
     deleteEmail
